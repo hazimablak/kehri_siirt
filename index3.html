@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kara Kerim | Yazar</title>
+    
+    <!-- Yazar hissiyatı için Fontlar -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- İkonlar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Gündüz Modu - Parşömen, Eski Kitap ve Bordo Tonları (Beyazdan Kaçınıldı) */
+        :root {
+            --bg-color: #eae3d9;        /* Sıcak parşömen / krem rengi */
+            --card-bg: #dfd5c5;         /* Daha koyu krem (kartlar için) */
+            --text-color: #3b332c;      /* Koyu kahve/gri metin */
+            --primary-color: #2b221d;   /* Başlıklar için neredeyse siyah sıcak kahve */
+            --accent-color: #7a1723;    /* Kitap kapağındaki bordo/kızıl ton */
+            --nav-bg: rgba(234, 227, 217, 0.92);
+            --shadow: rgba(43, 34, 29, 0.15);
+            --border-color: #c9bcab;
+        }
+
+        /* Gece Modu - Karanlık Akademi ve Mürekkep Tonları */
+        [data-theme="dark"] {
+            --bg-color: #161413;        /* Çok koyu sıcak gri/siyah */
+            --card-bg: #201c1a;         /* Hafif aydınlık kart arka planı */
+            --text-color: #c2b8ad;      /* Okunabilir yumuşak bej metin */
+            --primary-color: #e6dfd5;   /* Başlıklar için açık krem */
+            --accent-color: #a33b47;    /* Gece modunda parlayan bordo */
+            --nav-bg: rgba(22, 20, 19, 0.92);
+            --shadow: rgba(0, 0, 0, 0.6);
+            --border-color: #38312d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lora', serif; /* Metinler için kitap fontu */
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            font-weight: 700;
+            transition: color 0.5s ease;
+        }
+
+        /* Zarif Navigasyon */
+        header {
+            background-color: var(--nav-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 8%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Tipografik Yazar Logosu */
+        .logo-container {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-text {
+            font-size: 26px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo-subtext {
+            font-size: 11px;
+            font-family: 'Lora', serif;
+            color: var(--accent-color);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+
+        nav ul li {
+            margin-left: 35px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 15px;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        #theme-toggle {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 35px;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        #theme-toggle:hover {
+            color: var(--accent-color);
+            transform: rotate(15deg);
+        }
+
+        /* Genel Bölüm Düzeni */
+        section {
+            padding: 130px 8% 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 38px;
+            margin-bottom: 60px;
+            position: relative;
+            letter-spacing: 1px;
+        }
+
+        .section-title::after {
+            content: '❦'; /* Yazar temasına uygun süsleme */
+            display: block;
+            font-size: 24px;
+            color: var(--accent-color);
+            margin: 10px auto 0;
+            opacity: 0.7;
+        }
+
+        /* Kendi Kendine Animasyonlar */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes gentle-float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Butonlar */
+        .btn {
+            display: inline-block;
+            padding: 14px 35px;
+            background-color: var(--accent-color);
+            color: #eae3d9 !important;
+            text-decoration: none;
+            border-radius: 2px; /* Keskin, klasik köşeler */
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            letter-spacing: 1px;
+            transition: all 0.4s ease;
+            border: 1px solid var(--accent-color);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--accent-color) !important;
+        }
+
+        /* Hero / Anasayfa */
+        #anasayfa {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hero-text {
+            flex: 1;
+            padding-right: 60px;
+        }
+
+        .hero-text h1 {
+            font-size: 52px;
+            margin-bottom: 25px;
+            line-height: 1.15;
+        }
+
+        .hero-text p {
+            font-size: 19px;
+            margin-bottom: 35px;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: right;
+            position: relative;
+        }
+
+        /* Yüklediğin Kitap Kapağı */
+        .hero-image img {
+            max-width: 380px;
+            width: 100%;
+            border-radius: 4px;
+            box-shadow: -15px 20px 40px var(--shadow);
+            animation: gentle-float 6s ease-in-out infinite;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Hakkında */
+        #hakkinda {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .about-text {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+        }
+
+        .about-text p::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 50px;
+            float: left;
+            margin-right: 10px;
+            line-height: 1;
+            color: var(--accent-color);
+        }
+
+        /* Kitaplarım */
+        .book-showcase {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 15px 35px var(--shadow);
+            transition: all 0.5s ease;
+        }
+
+        .book-cover {
+            flex: 1;
+            padding: 40px;
+            background-color: #111; /* Kapağın etrafındaki karanlık alan */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .book-cover img {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            transition: transform 0.5s;
+        }
+        
+        .book-cover img:hover {
+            transform: scale(1.03);
+        }
+
+        .book-details {
+            flex: 1.5;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .book-details h3 {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+
+        .book-meta {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-color);
+            font-style: italic;
+            margin-bottom: 25px;
+            font-size: 18px;
+        }
+
+        /* Yazılar */
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .article-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px var(--shadow);
+            transition: transform 0.4s, box-shadow 0.4s;
+            position: relative;
+        }
+
+        .article-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .article-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .article-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+
+        .article-card .tag {
+            font-size: 13px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: block;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .article-card h4 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .read-more {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-top: 25px;
+            display: inline-block;
+            font-weight: 600;
+            font-style: italic;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 2px;
+            transition: color 0.3s;
+        }
+
+        .read-more:hover {
+            color: var(--accent-color);
+        }
+
+        /* İletişim */
+        .contact-wrapper {
+            display: flex;
+            gap: 60px;
+            background: var(--card-bg);
+            padding: 60px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 15px 35px var(--shadow);
+        }
+
+        .contact-info, .contact-form {
+            flex: 1;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .contact-form input:focus, .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: #0a0908;
+            color: #888;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 1px;
+            border-top: 2px solid var(--accent-color);
+        }
+
+        @media (max-width: 900px) {
+            #anasayfa, .book-showcase, .contact-wrapper {
+                flex-direction: column;
+            }
+            .hero-text {
+                padding-right: 0;
+                text-align: center;
+                margin-bottom: 50px;
+            }
+            .hero-image {
+                text-align: center;
+            }
+            nav ul {
+                display: none; 
+            }
+            .book-cover {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .book-details {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="#" class="logo-container">
+                <span class="logo-text">Kara Kerim</span>
+                <span class="logo-subtext">Yazar & Edebiyatçı</span>
+            </a>
+            <ul>
+                <li><a href="#anasayfa">Anasayfa</a></li>
+                <li><a href="#hakkinda">Hakkında</a></li>
+                <li><a href="#kitaplarim">Kitaplarım</a></li>
+                <li><a href="#yazilar">Yazılar & Makaleler</a></li>
+                <li><a href="#iletisim">İletişim</a></li>
+                <li>
+                    <button id="theme-toggle" aria-label="Temayı Değiştir">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="anasayfa">
+        <div class="hero-text reveal">
+            <h1>Kelimelerin Aynasında Gerçeği Arayan Bir Kalem.</h1>
+            <p>"İnsan ancak aynalardan kaçamadığı gün kendisiyle tanışır." <br> Edebiyat, felsefe ve varoluş üzerine kurgular...</p>
+            <a href="#kitaplarim" class="btn">Son Ayna'yı Keşfet</a>
+        </div>
+        <div class="hero-image reveal">
+            <!-- Yüklediğin kitap kapağı dosyası kullanıldı -->
+            <img src="images_2.jpeg" alt="Son Ayna Kitap Kapağı">
+        </div>
+    </section>
+
+    <section id="hakkinda">
+        <h2 class="section-title reveal">Yazar Hakkında</h2>
+        <div class="about-text reveal">
+            <p>Kara Kerim, edebiyat dünyasına "Son Ayna" adlı eseriyle adım atan, kelimelerin ve insan psikolojisinin en gizli dehlizlerine inmeyi görev edinen bir yazardır. Hikayelerinde modern insanın kalabalıklar içindeki yalnızlığını, geçmişin yakamızı bırakmayan gölgelerini ve ahlaki ikilemleri ele alır.</p>
+            <p>Sadece kurgusal eserler üretmekle kalmaz; aynı zamanda edebiyat ve sanat eleştirisi üzerine derinlikli makaleler kaleme alır. Bağımsız platformlarda yayımladığı denemeleriyle okurlarını düşündürmeye, sorgulatmaya ve rahatsız etmeye devam etmektedir.</p>
+        </div>
+    </section>
+
+    <section id="kitaplarim">
+        <h2 class="section-title reveal">Kitaplarım</h2>
+        <div class="book-showcase reveal">
+            <div class="book-cover">
+                <!-- Yüklediğin kitap kapağı dosyası kullanıldı -->
+                <img src="images_2.jpeg" alt="Son Ayna Kitap Kapağı">
+            </div>
+            <div class="book-details">
+                <h3>Son Ayna</h3>
+                <p class="book-meta">İlk Roman &bull; 2026</p>
+                <p style="margin-bottom: 30px;">Gerçekliğin kırılma noktalarını ve insanın kendi yüzüyle yüzleşmekten duyduğu derin korkuyu anlatan sarsıcı bir hikaye. Ana karakterin bir sabah uyandığında aynalarda kendi yansıması yerine geçmişindeki onulmaz hataları görmeye başlamasıyla açılan perde; okuru karanlık, sürükleyici ve psikolojik bir labirentin içine çekiyor.</p>
+                <div>
+                    <a href="#" class="btn">Satın Al</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="yazilar">
+        <h2 class="section-title reveal">Yazılar & Makaleler</h2>
+        <div class="article-grid">
+            <div class="article-card reveal">
+                <span class="tag">Makale</span>
+                <h4>Modern Edebiyatta Yabancılaşma</h4>
+                <p>Kafka'dan günümüze, ana karakterlerin topluma, normlara ve en nihayetinde kendi öz benliklerine yabancılaşması üzerine bir inceleme.</p>
+                <a href="#" class="read-more">Devamını Oku &rarr;</a>
+            </div>
+            <div class="article-card reveal">
+                <span class="tag">Deneme</span>
+                <h4>Aynaların Yalan Söylediği Günler</h4>
+                <p>Kendimizi olduğumuz gibi mi görüyoruz, yoksa sadece görmek istediğimiz illüzyonlara mı inanıyoruz? Gerçeklik algısı üzerine düşünceler.</p>
+                <a href="#" class="read-more">Devamını Oku &rarr;</a>
+            </div>
+            <div class="article-card reveal">
+                <span class="tag">İnceleme</span>
+                <h4>Klasikleri Yeniden Okumanın Yükü</h4>
+                <p>Her yaşta, her okumada farklı bir tat veren klasik eserlerin zaman içindeki dönüşümü ve okur üzerindeki psikolojik ağırlığı.</p>
+                <a href="#" class="read-more">Devamını Oku &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="iletisim">
+        <h2 class="section-title reveal">İletişim</h2>
+        <div class="contact-wrapper reveal">
+            <div class="contact-info">
+                <h3 style="font-size: 28px; margin-bottom: 20px;">Bana Ulaşın</h3>
+                <p style="margin-bottom: 30px;">Söyleşiler, imza günleri, telif hakları veya eserlerim hakkında fikirlerinizi paylaşmak için formu kullanabilir ya da doğrudan mektup gönderebilirsiniz.</p>
+                <p style="margin-bottom: 15px;"><i class="fa-solid fa-envelope" style="color: var(--accent-color); margin-right: 10px;"></i> iletisim@karakerim.com</p>
+                <p><i class="fa-solid fa-feather" style="color: var(--accent-color); margin-right: 10px;"></i> Edebiyat Ajansı, İstanbul</p>
+            </div>
+            <div class="contact-form">
+                <form onsubmit="event.preventDefault(); alert('Mesajınız başarıyla iletildi.');">
+                    <input type="text" placeholder="Adınız Soyadınız" required>
+                    <input type="email" placeholder="E-posta Adresiniz" required>
+                    <textarea rows="4" placeholder="Mesajınız" required></textarea>
+                    <button type="submit" class="btn" style="width: 100%;">Mektubu Gönder</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Kara Kerim. Kelimelerin gücü adına.</p>
+    </footer>
+
+    <script>
+        // Gece / Gündüz Modu Mantığı
+        const themeToggle = document.getElementById('theme-toggle');
+        const icon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.toggleAttribute('data-theme', 'dark');
+            
+            if (document.body.hasAttribute('data-theme')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun'); // Gece modundayken güneş çıksın
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon'); // Gündüz modundayken ay çıksın
+            }
+        });
+
+        // Scroll Animasyonları (Sayfa aşağı kaydıkça elementlerin belirmesi)
+        const reveals = document.querySelectorAll(".reveal");
+
+        function revealOnScroll() {
+            for (let i = 0; i < reveals.length; i++) {
+                let windowHeight = window.innerHeight;
+                let elementTop = reveals[i].getBoundingClientRect().top;
+                let elementVisible = 100; // Elementin 100px'i görününce tetikle
+
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        // Sayfa yüklendiğinde ve kaydırıldığında kontrol et
+        window.addEventListener("scroll", revealOnScroll);
+        revealOnScroll(); // İlk yüklemede ekrandakileri göster
+
+        // Menü linklerine tıklayınca yumuşak kaydırma (Smooth Scroll)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kara Kerim | Yazar</title>
+    <!-- Fontlar: Başlıklar için Serif (kitap hissiyatı), metinler için Sans-Serif -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #ecf0f1;
+            --accent-color: #d35400;
+            --text-color: #333;
+            --bg-color: #fcfcfc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+        }
+
+        /* Navigasyon */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav .logo {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 30px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Bölüm Ortak Stilleri */
+        section {
+            padding: 100px 10%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 2px;
+            background: var(--accent-color);
+            margin: 15px auto 0;
+        }
+
+        /* Hero / Anasayfa */
+        #anasayfa {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 80px;
+        }
+
+        .hero-text {
+            flex: 1;
+            padding-right: 50px;
+        }
+
+        .hero-text h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--accent-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #e67e22;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 300px;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Hakkında */
+        #hakkinda {
+            background-color: var(--secondary-color);
+        }
+
+        .about-content {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+        }
+
+        /* Kitaplarım */
+        .book-showcase {
+            display: flex;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .book-cover {
+            flex: 1;
+            background: #eee; /* Kitap kapağı gelene kadar yer tutucu */
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .book-details {
+            flex: 2;
+            padding: 50px;
+        }
+
+        .book-details h3 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        /* Makaleler ve Yazılar */
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .article-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .article-card h4 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .article-card .tag {
+            font-size: 12px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* İletişim */
+        #iletisim {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        #iletisim .section-title {
+            color: #fff;
+        }
+
+        .contact-wrapper {
+            display: flex;
+            gap: 50px;
+        }
+
+        .contact-info, .contact-form {
+            flex: 1;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Lato', sans-serif;
+        }
+
+        .contact-form button {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #1a252f;
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            #anasayfa, .about-content, .book-showcase, .contact-wrapper {
+                flex-direction: column;
+            }
+            .hero-text {
+                padding-right: 0;
+                text-align: center;
+                margin-bottom: 40px;
+            }
+            nav ul {
+                display: none; /* Mobil menü için JS eklenebilir */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="#" class="logo">Kara Kerim</a>
+            <ul>
+                <li><a href="#anasayfa">Anasayfa</a></li>
+                <li><a href="#hakkinda">Hakkında</a></li>
+                <li><a href="#kitaplarim">Kitaplarım</a></li>
+                <li><a href="#yazilar">Yazılar & Makaleler</a></li>
+                <li><a href="#iletisim">İletişim</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="anasayfa">
+        <div class="hero-text">
+            <h1>Kelimelerin Aynasında Gerçeği Arayan Bir Yazar.</h1>
+            <p>Edebiyat, felsefe ve insanın içsel yolculuğu üzerine denemeler ve kurgular. İlk romanım "Son Ayna" şimdi tüm kitapçılarda.</p>
+            <a href="#kitaplarim" class="btn">Son Ayna'yı Keşfet</a>
+        </div>
+        <div class="hero-image">
+            <!-- Kitap kapağı buraya gelecek -->
+            <div style="width: 280px; height: 400px; background: #e0e0e0; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-family: serif; font-size: 24px; color: #555;">
+                SON AYNA<br>Kapağı
+            </div>
+        </div>
+    </section>
+
+    <section id="hakkinda">
+        <h2 class="section-title">Hakkında</h2>
+        <div class="about-content">
+            <div style="flex: 1;">
+                <p>Kara Kerim, edebiyat dünyasına "Son Ayna" adlı eseriyle adım atan, kelimelerin ve insan psikolojisinin derinliklerine inmeyi seven bir yazardır. Hikayelerinde genellikle varoluşsal krizleri, modern insanın yalnızlığını ve toplumsal yansımaları ele alır.</p>
+                <br>
+                <p>Sadece kurgu değil, aynı zamanda edebiyat ve sanat eleştirisi üzerine makaleler de kaleme almakta, bağımsız platformlarda denemelerini okurlarıyla paylaşmaktadır.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="kitaplarim">
+        <h2 class="section-title">Kitaplarım</h2>
+        <div class="book-showcase">
+            <div class="book-cover">
+                <span style="font-family: serif; font-size: 24px; color: #777;">SON AYNA</span>
+            </div>
+            <div class="book-details">
+                <h3>Son Ayna</h3>
+                <p style="margin-bottom: 20px; color: #555;"><em>Yayın Yılı: 2026 | Yayınevi: [Yayınevi Adı]</em></p>
+                <p style="margin-bottom: 30px;">Gerçekliğin kırılma noktalarını ve insanın kendi yüzüyle yüzleşmekten duyduğu korkuyu anlatan sarsıcı bir ilk roman. Son Ayna, ana karakterin bir sabah uyandığında aynalarda kendi yansıması yerine geçmişindeki hataları görmeye başlamasıyla açılıyor...</p>
+                <a href="#" class="btn">Satın Al</a>
+                <a href="#" class="btn" style="background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); margin-left: 10px;">Goodreads'te İncele</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="yazilar">
+        <h2 class="section-title">Yazılar & Makaleler</h2>
+        <div class="article-grid">
+            <div class="article-card">
+                <span class="tag">Makale</span>
+                <h4>Modern Edebiyatta Yabancılaşma</h4>
+                <p>Kafka'dan günümüze karakterlerin topluma ve kendine yabancılaşması üzerine bir inceleme.</p>
+                <a href="#" style="color: var(--accent-color); text-decoration: none; margin-top: 15px; display: inline-block;">Devamını Oku &rarr;</a>
+            </div>
+            <div class="article-card">
+                <span class="tag">Deneme</span>
+                <h4>Aynaların Yalan Söylediği Günler</h4>
+                <p>Kendimizi olduğumuz gibi mi görüyoruz, yoksa görmek istediğimiz gibi mi?</p>
+                <a href="#" style="color: var(--accent-color); text-decoration: none; margin-top: 15px; display: inline-block;">Devamını Oku &rarr;</a>
+            </div>
+            <div class="article-card">
+                <span class="tag">İnceleme</span>
+                <h4>Klasikleri Yeniden Okumak</h4>
+                <p>Her yaşta farklı bir tat veren klasik eserlerin zaman içindeki dönüşümü.</p>
+                <a href="#" style="color: var(--accent-color); text-decoration: none; margin-top: 15px; display: inline-block;">Devamını Oku &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="iletisim">
+        <h2 class="section-title">İletişim</h2>
+        <div class="contact-wrapper">
+            <div class="contact-info">
+                <h3>Bana Ulaşın</h3>
+                <p style="margin: 20px 0;">Söyleşiler, imza günleri, telif hakları veya sadece eserlerim hakkında fikirlerinizi paylaşmak için aşağıdaki formu kullanabilir ya da sosyal medya üzerinden bana ulaşabilirsiniz.</p>
+                <p><strong>Email:</strong> iletisim@karakerim.com</p>
+            </div>
+            <div class="contact-form">
+                <form onsubmit="event.preventDefault(); alert('Mesaj gönderildi!');">
+                    <input type="text" placeholder="Adınız Soyadınız" required>
+                    <input type="email" placeholder="E-posta Adresiniz" required>
+                    <textarea rows="5" placeholder="Mesajınız" required></textarea>
+                    <button type="submit">Mesaj Gönder</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Kara Kerim. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script>
+        // Smooth Scrolling için basit bir JS
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

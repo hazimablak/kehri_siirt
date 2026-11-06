@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEHRİ | Siirt Yöresel Ürünleri</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom CSS & Animations */
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Marquee Animation */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* SPA Page Transitions */
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.6s ease forwards;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal Animation */
+        .modal {
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        /* Image Hover Zoom */
+        .img-zoom {
+            transition: transform 0.7s ease;
+        }
+        .group:hover .img-zoom {
+            transform: scale(1.1);
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- Shipping Marquee -->
+    <div class="bg-gradient-to-r from-brand-600 to-brand-500 text-white py-2 text-sm font-semibold tracking-wider z-50 relative marquee-container">
+        <div class="marquee-content" data-i18n="marquee">
+            🚀 81 İLE KARGO SEÇENEĞİMİZLE SİİRT'İN LEZZETLERİ KAPINIZDA! 🚀
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-40 border-b border-gray-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="#home" class="nav-link flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="navigate('home')">
+                    <span class="font-serif text-3xl font-bold text-brand-600 dark:text-brand-500 tracking-wider">KEHRİ</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="navigate('home')" class="nav-btn font-medium hover:text-brand-600 dark:hover:text-brand-400 transition" data-i18n="nav_home">Anasayfa</button>
+                    <button onclick="navigate('products')" class="nav-btn font-medium hover:text-brand-600 dark:hover:text-brand-400 transition" data-i18n="nav_products">Ürünlerimiz</button>
+                    <button onclick="navigate('about')" class="nav-btn font-medium hover:text-brand-600 dark:hover:text-brand-400 transition" data-i18n="nav_about">Hakkımızda</button>
+                    <button onclick="navigate('contact')" class="nav-btn font-medium hover:text-brand-600 dark:hover:text-brand-400 transition" data-i18n="nav_contact">İletişim</button>
+                </div>
+
+                <!-- Controls (Lang & Theme) -->
+                <div class="flex items-center gap-4">
+                    <select id="langSelect" aria-label="Dil Seçimi / Select Language" title="Dil Seçimi / Select Language" class="bg-transparent border border-gray-300 dark:border-slate-600 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-brand-500 cursor-pointer">
+                        <option value="tr">TR</option>
+                        <option value="en">EN</option>
+                        <option value="ar">AR</option>
+                        <option value="ku">KU</option>
+                    </select>
+                    <button id="themeToggle" aria-label="Gece/Gündüz Modu Değiştir" title="Temayı Değiştir" class="text-xl text-gray-600 dark:text-gray-300 hover:text-brand-500 transition-transform hover:rotate-12">
+                        <i class="fas fa-moon" aria-hidden="true"></i>
+                    </button>
+                    <!-- Mobile Menu Button -->
+                    <button class="md:hidden text-2xl text-gray-600 dark:text-gray-300" aria-label="Mobil Menüyü Aç" title="Menü" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu Panel -->
+        <div id="mobileMenu" class="hidden md:hidden glass border-t border-gray-200 dark:border-slate-800">
+            <div class="px-4 pt-2 pb-4 space-y-1 flex flex-col">
+                <button onclick="navigate('home'); document.getElementById('mobileMenu').classList.add('hidden')" class="text-left block px-3 py-2 text-base font-medium" data-i18n="nav_home">Anasayfa</button>
+                <button onclick="navigate('products'); document.getElementById('mobileMenu').classList.add('hidden')" class="text-left block px-3 py-2 text-base font-medium" data-i18n="nav_products">Ürünlerimiz</button>
+                <button onclick="navigate('about'); document.getElementById('mobileMenu').classList.add('hidden')" class="text-left block px-3 py-2 text-base font-medium" data-i18n="nav_about">Hakkımızda</button>
+                <button onclick="navigate('contact'); document.getElementById('mobileMenu').classList.add('hidden')" class="text-left block px-3 py-2 text-base font-medium" data-i18n="nav_contact">İletişim</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow">
+        
+        <!-- ================= HOME PAGE ================= -->
+        <section id="home" class="page active">
+            <div class="relative h-[80vh] flex items-center justify-center overflow-hidden">
+                <!-- Background Image & Overlay -->
+                <div class="absolute inset-0 z-0">
+                    <img src="https://storage.googleapis.com/goturkiye-tga-local/siirt-see-gi-2-botan-valley-1.jpg" alt="Siirt Doğa" class="w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-black/50 dark:bg-black/70"></div>
+                </div>
+                
+                <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
+                    <h1 class="text-5xl md:text-7xl font-serif text-white font-bold mb-6 tracking-tight drop-shadow-lg" data-i18n="hero_title">Doğadan Gelen Miras</h1>
+                    <p class="text-xl md:text-2xl text-gray-200 mb-10 font-light drop-shadow-md" data-i18n="hero_subtitle">Siirt'in en saf, en doğal yerel ürünleri özenle seçilip sizin için hazırlanıyor. Çok yakında online satışlarımız başlıyor!</p>
+                    <button onclick="navigate('products')" class="px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white rounded-full font-semibold text-lg transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(234,88,12,0.4)]" data-i18n="hero_btn">
+                        Ürünleri Keşfet
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="max-w-7xl mx-auto px-4 py-20 grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+                <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl hover:-translate-y-2 transition-transform">
+                    <div class="w-16 h-16 mx-auto bg-brand-100 dark:bg-brand-900 text-brand-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-leaf"></i></div>
+                    <h3 class="text-xl font-bold mb-2" data-i18n="feat_1_title">%100 Doğal</h3>
+                    <p class="text-gray-600 dark:text-gray-400" data-i18n="feat_1_desc">Hiçbir katkı maddesi içermeyen, tamamen organik yöntemlerle üretilmiş yöresel ürünler.</p>
+                </div>
+                <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl hover:-translate-y-2 transition-transform">
+                    <div class="w-16 h-16 mx-auto bg-brand-100 dark:bg-brand-900 text-brand-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-truck-fast"></i></div>
+                    <h3 class="text-xl font-bold mb-2" data-i18n="feat_2_title">Hızlı Kargo</h3>
+                    <p class="text-gray-600 dark:text-gray-400" data-i18n="feat_2_desc">Türkiye'nin 81 iline özenle paketlenmiş, güvenli ve hızlı teslimat garantisi.</p>
+                </div>
+                <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl hover:-translate-y-2 transition-transform">
+                    <div class="w-16 h-16 mx-auto bg-brand-100 dark:bg-brand-900 text-brand-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-medal"></i></div>
+                    <h3 class="text-xl font-bold mb-2" data-i18n="feat_3_title">Yüksek Kalite</h3>
+                    <p class="text-gray-600 dark:text-gray-400" data-i18n="feat_3_desc">Nesilden nesile aktarılan tecrübe ile hazırlanmış, birinci sınıf Siirt lezzetleri.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PRODUCTS PAGE ================= -->
+        <section id="products" class="page py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-serif font-bold text-gray-900 dark:text-white mb-4" data-i18n="nav_products">Ürünlerimiz</h2>
+                <div class="w-24 h-1 bg-brand-500 mx-auto rounded"></div>
+            </div>
+
+            <!-- Filter & Search -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
+                <div class="flex flex-wrap gap-2 justify-center" id="filter-buttons">
+                    <button class="filter-btn active px-4 py-2 rounded-full border border-brand-500 bg-brand-500 text-white transition-all" data-filter="all" data-i18n="filter_all">Tümü</button>
+                    <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 dark:border-slate-600 hover:border-brand-500 dark:hover:border-brand-500 hover:text-brand-500 transition-all" data-filter="kuruyemis" data-i18n="filter_nuts">Kuruyemiş</button>
+                    <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 dark:border-slate-600 hover:border-brand-500 dark:hover:border-brand-500 hover:text-brand-500 transition-all" data-filter="kozmetik" data-i18n="filter_cosmetics">Kozmetik</button>
+                    <button class="filter-btn px-4 py-2 rounded-full border border-gray-300 dark:border-slate-600 hover:border-brand-500 dark:hover:border-brand-500 hover:text-brand-500 transition-all" data-filter="gida" data-i18n="filter_food">Yöresel Gıda</button>
+                </div>
+                <div class="relative w-full md:w-72">
+                    <input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all" placeholder="Ürün ara..." data-i18n-ph="search_placeholder">
+                    <i class="fas fa-search absolute left-4 top-3 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Products will be injected via JS -->
+            </div>
+        </section>
+
+        <!-- ================= ABOUT PAGE ================= -->
+        <section id="about" class="page py-16 px-4 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl group">
+                    <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Siirt" class="w-full h-full object-cover img-zoom">
+                    <div class="absolute inset-0 bg-brand-600/20 group-hover:bg-transparent transition-all"></div>
+                </div>
+                <div>
+                    <h2 class="text-4xl font-serif font-bold mb-6 text-gray-900 dark:text-white" data-i18n="nav_about">Hakkımızda</h2>
+                    <div class="w-24 h-1 bg-brand-500 mb-8 rounded"></div>
+                    <div class="space-y-6 text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                        <p data-i18n="about_p1">
+                            <strong class="text-brand-600 dark:text-brand-400 text-xl">KEHRİ</strong> olarak, Siirt'in bereketli topraklarından sofralarınıza uzanan doğal bir köprü kuruyoruz. Amacımız, sanayileşmiş gıdalardan uzak, atalarımızdan miras kalan geleneksel üretim yöntemleriyle hazırlanmış yöresel lezzetleri en saf haliyle sizlere ulaştırmaktır.
+                        </p>
+                        <p data-i18n="about_p2">
+                            Yerel üreticilerimizi destekliyor, toprağa ve emeğe saygı duyuyoruz. Fıstığın en irisi, balın en doğalı, bıttım sabununun en şifalısı özenle seçilerek modern ve hijyenik koşullarda paketlenmektedir.
+                        </p>
+                        <p data-i18n="about_p3">
+                            Vizyonumuz; Siirt'in kültürel ve gastronomik mirasını tüm Türkiye'ye ve dünyaya en kaliteli şekilde tanıtmak, sofralarınızda güvenle tüketebileceğiniz doğal bir marka olmaktır.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CONTACT PAGE ================= -->
+        <section id="contact" class="page py-16 px-4 max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-serif font-bold text-gray-900 dark:text-white mb-4" data-i18n="nav_contact">İletişim</h2>
+                <div class="w-24 h-1 bg-brand-500 mx-auto rounded"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Info Cards -->
+                <div class="col-span-1 space-y-6">
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg flex items-center gap-4">
+                        <div class="w-12 h-12 bg-brand-100 dark:bg-brand-900/50 text-brand-600 rounded-full flex items-center justify-center text-xl shrink-0"><i class="fas fa-map-marker-alt"></i></div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 dark:text-white" data-i18n="contact_address">Adres</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">Merkez, Siirt / Türkiye</p>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg flex items-center gap-4">
+                        <div class="w-12 h-12 bg-brand-100 dark:bg-brand-900/50 text-brand-600 rounded-full flex items-center justify-center text-xl shrink-0"><i class="fas fa-phone"></i></div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 dark:text-white" data-i18n="contact_phone">Telefon & WhatsApp</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">+90 555 555 55 55</p>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg flex items-center gap-4">
+                        <div class="w-12 h-12 bg-brand-100 dark:bg-brand-900/50 text-brand-600 rounded-full flex items-center justify-center text-xl shrink-0"><i class="fas fa-envelope"></i></div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 dark:text-white" data-i18n="contact_email">E-Posta</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">info@kehri.com.tr</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div class="col-span-1 md:col-span-2 bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-slate-700">
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white" data-i18n="contact_form_title">Bize Mesaj Gönderin</h3>
+                    <form id="contactForm" onsubmit="submitForm(event)" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="form_name">Adınız Soyadınız</label>
+                                <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="form_email">E-Posta Adresiniz</label>
+                                <input type="email" required class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" data-i18n="form_msg">Mesajınız</label>
+                            <textarea rows="4" required class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all outline-none"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl transition-colors shadow-lg shadow-brand-500/30" data-i18n="form_btn">
+                            Mesajı Gönder <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="modal fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="modal-content relative bg-white dark:bg-slate-800 w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
+            <button onclick="closeModal()" aria-label="Pencereyi Kapat" title="Kapat" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/50 dark:bg-black/50 hover:bg-white dark:hover:bg-black rounded-full flex items-center justify-center transition-colors backdrop-blur-md">
+                <i class="fas fa-times text-gray-800 dark:text-white text-lg" aria-hidden="true"></i>
+            </button>
+            
+            <div class="w-full md:w-1/2 h-64 md:h-auto relative">
+                <img id="modalImg" src="" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center overflow-y-auto">
+                <span id="modalCat" class="text-brand-500 text-sm font-bold tracking-widest uppercase mb-2"></span>
+                <h2 id="modalTitle" class="text-3xl font-serif font-bold text-gray-900 dark:text-white mb-4"></h2>
+                <div class="w-16 h-1 bg-brand-500 mb-6 rounded"></div>
+                <p id="modalDesc" class="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8"></p>
+                
+                <div class="mt-auto">
+                    <div class="flex items-center gap-4">
+                        <span class="px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-xl font-bold border border-gray-200 dark:border-slate-600" data-i18n="soon">Çok Yakında</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400" data-i18n="modal_note">Fiyatlandırma ve online sipariş altyapımız tamamlanmaktadır.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/905555555555" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp üzerinden bizimle iletişime geçin" class="fixed bottom-6 right-6 w-16 h-16 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-full flex items-center justify-center text-3xl shadow-[0_4px_15px_rgba(37,211,102,0.4)] transition-transform hover:scale-110 z-40 group">
+        <i class="fab fa-whatsapp" aria-hidden="true"></i>
+        <span class="absolute right-20 bg-white dark:bg-slate-800 text-gray-800 dark:text-white text-sm px-4 py-2 rounded-xl shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap font-medium" data-i18n="wa_tooltip">Bize Ulaşın</span>
+    </a>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10 mb-10 text-center md:text-left">
+            <div class="md:col-span-1">
+                <a href="#home" onclick="navigate('home')" class="font-serif text-3xl font-bold text-brand-600 dark:text-brand-500 tracking-wider block mb-4">KEHRİ</a>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-6" data-i18n="footer_desc">Siirt'in doğal ve yöresel zenginliklerini, geleneksel yöntemlerle sofralarınıza taşıyoruz.</p>
+            </div>
+            
+            <div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-4" data-i18n="footer_links">Hızlı Bağlantılar</h4>
+                <ul class="space-y-2 text-sm text-gray-500 dark:text-gray-400">
+                    <li><button onclick="navigate('home')" class="hover:text-brand-500 transition" data-i18n="nav_home">Anasayfa</button></li>
+                    <li><button onclick="navigate('products')" class="hover:text-brand-500 transition" data-i18n="nav_products">Ürünlerimiz</button></li>
+                    <li><button onclick="navigate('about')" class="hover:text-brand-500 transition" data-i18n="nav_about">Hakkımızda</button></li>
+                    <li><button onclick="navigate('contact')" class="hover:text-brand-500 transition" data-i18n="nav_contact">İletişim</button></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-4" data-i18n="contact_contact">İletişim Bilgileri</h4>
+                <ul class="space-y-2 text-sm text-gray-500 dark:text-gray-400">
+                    <li>Merkez / Siirt</li>
+                    <li>info@kehri.com.tr</li>
+                    <li>+90 555 555 55 55</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-900 dark:text-white mb-4" data-i18n="footer_social">Bizi Takip Edin</h4>
+                <div class="flex justify-center md:justify-start space-x-4">
+                    <a href="#" aria-label="Instagram hesabımız" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition-all"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Facebook hesabımız" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition-all"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Twitter hesabımız" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition-all"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-200 dark:border-slate-800 pt-8 text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col md:flex-row justify-center items-center gap-2">
+            <span>&copy; 2026 Tüm Hakları Saklıdır.</span>
+            <span class="hidden md:inline">|</span>
+            <span data-i18n="footer_developed">Developed by</span> 
+            <a href="https://marifetix-web-git-main-hazimablaks-projects.vercel.app/" target="_blank" rel="noopener noreferrer" class="font-bold text-brand-600 dark:text-brand-500 hover:underline">MarifetixSoft</a>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* --- Products Database --- */
+        const products = [
+            {
+                id: 1,
+                category: "kuruyemis",
+                img: "https://static.ticimax.cloud/49267/uploads/urunresimleri/buyuk/ozel-siirt-fistigi-pembe-500-grm-f2315b.jpg",
+                tr: { title: "Ana Çatlak Siirt Fıstığı", desc: "Kavrulmuş, iri taneli, %100 doğal birinci kalite ana çatlak Siirt Fıstığı. Kendine has aroması ve yüksek besin değeriyle sofralarınızın vazgeçilmezi.", cat: "Kuruyemiş" },
+                en: { title: "Premium Siirt Pistachio", desc: "Roasted, large-grained, 100% natural premium Siirt Pistachio. Indispensable for your tables with its unique aroma and high nutritional value.", cat: "Nuts" },
+                ar: { title: "فستق سعرد الفاخر", desc: "فستق سعرد محمص، كبير الحبة، طبيعي 100%. لا غنى عنه على موائدكم بنكهته الفريدة وقيمته الغذائية العالية.", cat: "مكسرات" },
+                ku: { title: "Fistiqên Sêrtê yên Taybet", desc: "Qelaştî, heb mezin, %100 xwezayî. Bi tama xwe ya taybet û nirxa xwe ya xwarinê ya bilind ji bo sifreyên we pêwîst e.", cat: "Çerez" }
+            },
+            {
+                id: 2,
+                category: "kozmetik",
+                img: "https://i20.haber7.net/resize/1300x788//haber/haber7/photos/2025/21/siirtin_bittim_sabunu_artik_tescilli_faydalari_saymakla_bitmiyor_1748004409_1139.jpg",
+                tr: { title: "Geleneksel Bıttım Sabunu", desc: "Yabani fıstık (bıttım) yağından el yapımı olarak üretilen, kimyasal içermeyen doğal sabun. Saç dökülmesi ve kepeklenmeye karşı geleneksel çözüm.", cat: "Kozmetik" },
+                en: { title: "Traditional Bıttım Soap", desc: "Handmade natural soap made from wild pistachio (bıttım) oil, chemical-free. Traditional solution against hair loss and dandruff.", cat: "Cosmetics" },
+                ar: { title: "صابون البطم التقليدي", desc: "صابون طبيعي مصنوع يدوياً من زيت الفستق البري (البطم)، خالي من المواد الكيميائية. الحل التقليدي لتساقط الشعر وقشرة الرأس.", cat: "مستحضرات التجميل" },
+                ku: { title: "Sabûna Bıttım ya Kevneşopî", desc: "Sabûna xwezayî ya destçêkirî ku ji rûnê fistiqên kovî (bıttım) tê çêkirin. Çareseriya kevneşopî ya li dijî weşîna porê.", cat: "Kozmetîk" }
+            },
+            {
+                id: 3,
+                category: "gida",
+                img: "https://www.gokbudak.com.tr/wp-content/uploads/2023/03/siirt-pervari-tabak-petek-bal-475-gram-gokbudak-bal.jpg",
+                tr: { title: "Hakiki Pervari Karakovan Balı", desc: "Siirt Pervari'nin yüksek rakımlı yaylalarından elde edilen, şifa deposu hakiki karakovan balı. Şeker ilavesiz, tamamen doğal arı üretimi.", cat: "Yöresel Gıda" },
+                en: { title: "Authentic Pervari Honey", desc: "Healing authentic honeycomb honey obtained from the high altitude plateaus of Siirt Pervari. No added sugar, completely natural.", cat: "Local Food" },
+                ar: { title: "عسل برواري الأصلي", desc: "عسل الشفاء الأصلي الذي يتم الحصول عليه من هضاب سعرد برواري العالية. بدون سكر مضاف، طبيعي تماماً.", cat: "طعام محلي" },
+                ku: { title: "Hingivê Perwariyê yê Resen", desc: "Hingivê qerekowan ê şifadar ku ji zozanên bilind ên Perwariya Sêrtê tê bidestxistin. Bê şekir e, bi tevahî xwezayî ye.", cat: "Xwarina Herêmî" }
+            },
+            {
+                id: 4,
+                category: "gida",
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGyGlkWFGrEK7u7ZPGmRbiKVgXffBZ8HWDHAJTTgjmo67DraZVX2VW0-DW&s=10",
+                tr: { title: "Siirt Tayfi Üzümü", desc: "İnce kabuklu, çekirdekli ve iri taneli meşhur Siirt Tayfi üzümü. Güneşin enerjisini sofralarınıza taşıyan doğal tatlılık.", cat: "Yöresel Gıda" },
+                en: { title: "Siirt Tayfi Grape", desc: "Famous Siirt Tayfi grape with thin skin, seeds and large grains. Natural sweetness carrying the sun's energy.", cat: "Local Food" },
+                ar: { title: "عنب طايفي سعرد", desc: "عنب سعرد الطايفي الشهير ذو القشرة الرقيقة والبذور والحبات الكبيرة. حلاوة طبيعية تحمل طاقة الشمس.", cat: "طعام محلي" },
+                ku: { title: "Tiriyê Tayfî yê Sêrtê", desc: "Tiriyê Tayfî yê navdar ê Sêrtê yê bi qalikê tenik û dendik. Şirîniya xwezayî ya ku enerjiya rojê tîne sifreyên we.", cat: "Xwarina Herêmî" }
+            }
+        ];
+
+        let currentLang = 'tr';
+
+        /* --- SPA Routing (Single Page Navigation) --- */
+        function navigate(pageId) {
+            // Update URL hash without jumping
+            history.pushState(null, null, `#${pageId}`);
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show target page
+            const target = document.getElementById(pageId);
+            if(target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            // Render products if navigating to products page
+            if(pageId === 'products') renderProducts();
+        }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', () => {
+            const hash = window.location.hash.replace('#', '') || 'home';
+            navigate(hash);
+        });
+
+        /* --- Theme Toggle --- */
+        const themeToggleBtn = document.getElementById('themeToggle');
+        
+        function setTheme(isDark) {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Init theme
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            setTheme(true);
+        } else {
+            setTheme(false);
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            setTheme(!document.documentElement.classList.contains('dark'));
+        });
+
+        /* --- Product Rendering & Filtering --- */
+        const productGrid = document.getElementById('productGrid');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('searchInput');
+
+        function renderProducts(filter = 'all', searchQuery = '') {
+            productGrid.innerHTML = '';
+            
+            const filteredProducts = products.filter(p => {
+                const matchFilter = filter === 'all' || p.category === filter;
+                const matchSearch = p[currentLang].title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchFilter && matchSearch;
+            });
+
+            if(filteredProducts.length === 0) {
+                productGrid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500 dark:text-gray-400">Ürün bulunamadı.</div>`;
+                return;
+            }
+
+            filteredProducts.forEach((p, index) => {
+                const data = p[currentLang];
+                // Apply a slight delay to each card for stagger effect
+                const animDelay = index * 0.1;
+                
+                const cardHtml = `
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-lg border border-gray-100 dark:border-slate-700 group cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 opacity-0 animate-[fadeUp_0.6s_ease_forwards]" style="animation-delay: ${animDelay}s" onclick="openModal(${p.id})">
+                        <div class="h-64 overflow-hidden relative">
+                            <img src="${p.img}" alt="${data.title}" class="w-full h-full object-cover img-zoom">
+                            <div class="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur text-brand-600 dark:text-brand-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                ${data.cat}
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">${data.title}</h3>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4">${data.desc}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-brand-500 font-semibold" data-i18n="soon">Çok Yakında</span>
+                                <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-700 flex items-center justify-center text-gray-400 group-hover:bg-brand-500 group-hover:text-white transition-colors">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                productGrid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+            
+            // Re-translate dynamic elements if needed
+            applyTranslations();
+        }
+
+        // Filter Click Events
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active state
+                filterBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-brand-500', 'text-white');
+                    b.classList.add('text-gray-800', 'dark:text-gray-200'); // Reset colors
+                });
+                const target = e.target;
+                target.classList.add('active', 'bg-brand-500', 'text-white');
+                target.classList.remove('text-gray-800', 'dark:text-gray-200');
+                
+                renderProducts(target.getAttribute('data-filter'), searchInput.value);
+            });
+        });
+
+        // Search Event
+        searchInput.addEventListener('input', (e) => {
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            renderProducts(activeFilter, e.target.value);
+        });
+
+        /* --- Modal Logic --- */
+        const modal = document.getElementById('productModal');
+        const mImg = document.getElementById('modalImg');
+        const mTitle = document.getElementById('modalTitle');
+        const mDesc = document.getElementById('modalDesc');
+        const mCat = document.getElementById('modalCat');
+
+        function openModal(id) {
+            const product = products.find(p => p.id === id);
+            if(!product) return;
+            
+            const data = product[currentLang];
+            mImg.src = product.img;
+            mTitle.innerText = data.title;
+            mDesc.innerText = data.desc;
+            mCat.innerText = data.cat;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        /* --- Contact Form Simulation --- */
+        function submitForm(e) {
+            e.preventDefault();
+            // WhatsApp API yönlendirmesi veya alert
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Gönderiliyor...';
+            
+            setTimeout(() => {
+                alert("Mesajınız başarıyla alınmıştır. En kısa sürede size dönüş yapacağız!");
+                e.target.reset();
+                btn.innerHTML = originalText;
+            }, 1000);
+        }
+
+        /* --- Multi-Language System (i18n) --- */
+        const translations = {
+            tr: {
+                marquee: "🚀 81 İLE KARGO SEÇENEĞİMİZLE SİİRT'İN LEZZETLERİ KAPINIZDA! 🚀",
+                nav_home: "Anasayfa", nav_products: "Ürünlerimiz", nav_about: "Hakkımızda", nav_contact: "İletişim",
+                hero_title: "Doğadan Gelen Miras", hero_subtitle: "Siirt'in en saf, en doğal yerel ürünleri özenle seçilip sizin için hazırlanıyor. Çok yakında online satışlarımız başlıyor!", hero_btn: "Ürünleri Keşfet",
+                feat_1_title: "%100 Doğal", feat_1_desc: "Hiçbir katkı maddesi içermeyen, tamamen organik yöntemlerle üretilmiş yöresel ürünler.",
+                feat_2_title: "Hızlı Kargo", feat_2_desc: "Türkiye'nin 81 iline özenle paketlenmiş, güvenli ve hızlı teslimat garantisi.",
+                feat_3_title: "Yüksek Kalite", feat_3_desc: "Nesilden nesile aktarılan tecrübe ile hazırlanmış, birinci sınıf Siirt lezzetleri.",
+                filter_all: "Tümü", filter_nuts: "Kuruyemiş", filter_cosmetics: "Kozmetik", filter_food: "Yöresel Gıda", search_placeholder: "Ürün ara...",
+                about_p1: "<strong class='text-brand-600 dark:text-brand-400 text-xl'>KEHRİ</strong> olarak, Siirt'in bereketli topraklarından sofralarınıza uzanan doğal bir köprü kuruyoruz. Amacımız, sanayileşmiş gıdalardan uzak, atalarımızdan miras kalan geleneksel üretim yöntemleriyle hazırlanmış yöresel lezzetleri en saf haliyle sizlere ulaştırmaktır.",
+                about_p2: "Yerel üreticilerimizi destekliyor, toprağa ve emeğe saygı duyuyoruz. Fıstığın en irisi, balın en doğalı, bıttım sabununun en şifalısı özenle seçilerek modern ve hijyenik koşullarda paketlenmektedir.",
+                about_p3: "Vizyonumuz; Siirt'in kültürel ve gastronomik mirasını tüm Türkiye'ye ve dünyaya en kaliteli şekilde tanıtmak, sofralarınızda güvenle tüketebileceğiniz doğal bir marka olmaktır.",
+                contact_address: "Adres", contact_phone: "Telefon & WhatsApp", contact_email: "E-Posta", contact_form_title: "Bize Mesaj Gönderin",
+                form_name: "Adınız Soyadınız", form_email: "E-Posta Adresiniz", form_msg: "Mesajınız", form_btn: "Mesajı Gönder <i class='fas fa-paper-plane ml-2'></i>",
+                soon: "Çok Yakında", modal_note: "Fiyatlandırma ve online sipariş altyapımız tamamlanmaktadır.", wa_tooltip: "Bize Ulaşın",
+                footer_desc: "Siirt'in doğal ve yöresel zenginliklerini, geleneksel yöntemlerle sofralarınıza taşıyoruz.", footer_links: "Hızlı Bağlantılar", contact_contact: "İletişim Bilgileri", footer_social: "Bizi Takip Edin", footer_developed: "Developed by"
+            },
+            en: {
+                marquee: "🚀 SIIRT'S DELICACIES AT YOUR DOOR WITH SHIPPING TO 81 PROVINCES! 🚀",
+                nav_home: "Home", nav_products: "Products", nav_about: "About Us", nav_contact: "Contact",
+                hero_title: "Heritage from Nature", hero_subtitle: "The purest, most natural local products of Siirt are carefully selected for you. Online sales starting soon!", hero_btn: "Discover Products",
+                feat_1_title: "100% Natural", feat_1_desc: "Local products produced with completely organic methods, containing no additives.",
+                feat_2_title: "Fast Shipping", feat_2_desc: "Carefully packaged, safe and fast delivery guarantee to 81 provinces of Turkey.",
+                feat_3_title: "High Quality", feat_3_desc: "First-class Siirt delicacies prepared with experience passed down from generation to generation.",
+                filter_all: "All", filter_nuts: "Nuts", filter_cosmetics: "Cosmetics", filter_food: "Local Food", search_placeholder: "Search products...",
+                about_p1: "As <strong class='text-brand-600 dark:text-brand-400 text-xl'>KEHRİ</strong>, we build a natural bridge from the fertile lands of Siirt to your tables. Our aim is to deliver local tastes prepared with traditional production methods inherited from our ancestors.",
+                about_p2: "We support our local producers and respect the soil and labor. The largest pistachios, the most natural honey, and the most healing soap are carefully selected and packaged.",
+                about_p3: "Our vision is to introduce Siirt's cultural and gastronomic heritage to Turkey and the world in the highest quality, and to be a natural brand you can safely consume.",
+                contact_address: "Address", contact_phone: "Phone & WhatsApp", contact_email: "Email", contact_form_title: "Send Us a Message",
+                form_name: "Full Name", form_email: "Email Address", form_msg: "Your Message", form_btn: "Send Message <i class='fas fa-paper-plane ml-2'></i>",
+                soon: "Coming Soon", modal_note: "Pricing and online ordering infrastructure are being completed.", wa_tooltip: "Contact Us",
+                footer_desc: "We bring the natural and local riches of Siirt to your tables with traditional methods.", footer_links: "Quick Links", contact_contact: "Contact Info", footer_social: "Follow Us", footer_developed: "Developed by"
+            },
+            ar: {
+                marquee: "🚀 شحن إلى 81 ولاية، نكهات سعرد على عتبة داركم! 🚀",
+                nav_home: "الرئيسية", nav_products: "المنتجات", nav_about: "من نحن", nav_contact: "اتصل بنا",
+                hero_title: "تراث من الطبيعة", hero_subtitle: "يتم اختيار أنقى وأفضل المنتجات المحلية في سعرد بعناية لك. مبيعاتنا عبر الإنترنت تبدأ قريباً!", hero_btn: "اكتشف المنتجات",
+                feat_1_title: "طبيعي 100%", feat_1_desc: "منتجات محلية منتجة بأساليب عضوية بالكامل، خالية من الإضافات.",
+                feat_2_title: "شحن سريع", feat_2_desc: "مغلفة بعناية، ضمان توصيل آمن وسريع لجميع الولايات.",
+                feat_3_title: "جودة عالية", feat_3_desc: "أطباق سعرد من الدرجة الأولى معدة بخبرة متوارثة عبر الأجيال.",
+                filter_all: "الكل", filter_nuts: "مكسرات", filter_cosmetics: "مستحضرات", filter_food: "طعام محلي", search_placeholder: "ابحث عن المنتجات...",
+                about_p1: "بصفتنا <strong class='text-brand-600 dark:text-brand-400 text-xl'>KEHRİ</strong>، نبني جسراً طبيعياً من أراضي سعرد الخصبة إلى موائدكم. هدفنا هو تقديم الأذواق المحلية بأصفى صورها.",
+                about_p2: "نحن ندعم منتجينا المحليين ونحترم الأرض والعمل. يتم اختيار أفضل المكونات بعناية فائقة وتعبئتها في ظروف صحية.",
+                about_p3: "رؤيتنا هي تقديم التراث الثقافي وفن الطهو في سعرد إلى العالم بأعلى جودة لتكون علامة تجارية موثوقة.",
+                contact_address: "العنوان", contact_phone: "الهاتف وواتساب", contact_email: "البريد الإلكتروني", contact_form_title: "أرسل لنا رسالة",
+                form_name: "الاسم الكامل", form_email: "البريد الإلكتروني", form_msg: "رسالتك", form_btn: "إرسال الرسالة <i class='fas fa-paper-plane ml-2'></i>",
+                soon: "قريباً", modal_note: "يتم استكمال التسعير والبنية التحتية للطلب عبر الإنترنت.", wa_tooltip: "تواصل معنا",
+                footer_desc: "نجلب ثروات سعرد الطبيعية والمحلية إلى موائدكم بالطرق التقليدية.", footer_links: "روابط سريعة", contact_contact: "معلومات الاتصال", footer_social: "تابعنا", footer_developed: "طُوّر بواسطة"
+            },
+            ku: {
+                marquee: "🚀 BI VEBIJÊRKA KARGOYÊ BO 81 BAJARAN, BERHEMÊN SÊRTÊ LI BER DERIYÊ TE NE! 🚀",
+                nav_home: "Destpêk", nav_products: "Berhemên Me", nav_about: "Derbarê Me", nav_contact: "Têkilî",
+                hero_title: "Mîrateya Ji Xwezayê", hero_subtitle: "Berhemên xwecihî yên herî saf ên Sêrtê bi taybetî ji bo we tên hilbijartin. Firotana online di demek nêz de dest pê dike!", hero_btn: "Berheman Kêşf Bike",
+                feat_1_title: "%100 Xwezayî", feat_1_desc: "Berhemên xwecihî yên bê maddeyên lêzêdekirî û bi rêbazên organîk hatine çêkirin.",
+                feat_2_title: "Kargoya Lez", feat_2_desc: "Garantiya gihandina ewledar û bilez bo 81 bajaran.",
+                feat_3_title: "Kalîteya Bilind", feat_3_desc: "Lezzetên Sêrtê yên pola yekem bi ezmûna nifş bi nifş têne amadekirin.",
+                filter_all: "Hemû", filter_nuts: "Çerez", filter_cosmetics: "Kozmetîk", filter_food: "Xwarina Herêmî", search_placeholder: "Li berheman bigere...",
+                about_p1: "Wekî <strong class='text-brand-600 dark:text-brand-400 text-xl'>KEHRİ</strong>, em ji xaka biber a Sêrtê pirek xwezayî berbi sifreyên we ava dikin.",
+                about_p2: "Em piştgirî didin hilberînerên xwe yên herêmî û rêzê li ax û kedê digirin. Em berhemên herî baş hildibijêrin û bi baldarî pakêt dikin.",
+                about_p3: "Vîzyona me ew e ku mîrateya çandî ya Sêrtê bi kalîteya herî baş bi cîhanê bidin nasîn û bibin markeyek pêbawer.",
+                contact_address: "Navnîşan", contact_phone: "Telefon & WhatsApp", contact_email: "E-Peyam", contact_form_title: "Peyamek Ji Me Re Bişîne",
+                form_name: "Nav û Paşnav", form_email: "Navnîşana E-peyam", form_msg: "Peyama Te", form_btn: "Peyamê Bişîne <i class='fas fa-paper-plane ml-2'></i>",
+                soon: "Nêzîk de", modal_note: "Binesaziya me ya bihakirin û fermana serhêl tê qedandin.", wa_tooltip: "Têkilî",
+                footer_desc: "Em zengîniyên xwezayî yên Sêrtê bi rêbazên kevneşopî tînin sifreyên we.", footer_links: "Zencîreyên Lezgîn", contact_contact: "Agahiyên Têkiliyê", footer_social: "Me Bişopînin", footer_developed: "Pêşvebirin ji aliyê"
+            }
+        };
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(translations[currentLang][key]) {
+                    el.innerHTML = translations[currentLang][key];
+                }
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if(translations[currentLang][key]) {
+                    el.placeholder = translations[currentLang][key];
+                }
+            });
+        }
+
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            applyTranslations();
+            // Re-render products to update translated data
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            renderProducts(activeFilter, searchInput.value);
+        });
+
+        /* --- Initialization --- */
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check hash and navigate
+            const hash = window.location.hash.replace('#', '') || 'home';
+            navigate(hash);
+            applyTranslations();
+        });
+
+    </script>
+</body>
+</html>
